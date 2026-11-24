@@ -141,7 +141,7 @@ public:
 class JobsList;
 
 class QuitCommand : public BuiltInCommand {
-    // TODO: Add your data members
+    JobsList *jobs;
 public:
     QuitCommand(const char *cmd_line, JobsList *jobs);
 
@@ -154,16 +154,26 @@ public:
 class JobsList {
 public:
     class JobEntry {
-        // TODO: Add your data members
+    public:
+        int job_id;
+        pid_t pid;
+        std::string cmd_line;
+
+        JobEntry(int job_id, pid_t pid, const std::string &cmd_line)
+            : job_id(job_id), pid(pid), cmd_line(cmd_line) {}
     };
 
-    // TODO: Add your data members
+private:
+    std::vector<JobEntry> jobs_vec;
+
 public:
     JobsList();
 
     ~JobsList();
 
     void addJob(Command *cmd, bool isStopped = false);
+
+    void addJob(const std::string &cmd_line, pid_t pid);
 
     void printJobsList();
 
@@ -179,11 +189,11 @@ public:
 
     JobEntry *getLastStoppedJob(int *jobId);
 
-    // TODO: Add extra methods or modify exisitng ones as needed
+    bool isEmpty() const;
 };
 
 class JobsCommand : public BuiltInCommand {
-    // TODO: Add your data members
+    JobsList *jobs;
 public:
     JobsCommand(const char *cmd_line, JobsList *jobs);
 
@@ -194,7 +204,7 @@ public:
 };
 
 class KillCommand : public BuiltInCommand {
-    // TODO: Add your data members
+    JobsList *jobs;
 public:
     KillCommand(const char *cmd_line, JobsList *jobs);
 
@@ -205,7 +215,7 @@ public:
 };
 
 class ForegroundCommand : public BuiltInCommand {
-    // TODO: Add your data members
+    JobsList *jobs;
 public:
     ForegroundCommand(const char *cmd_line, JobsList *jobs);
 
@@ -322,6 +332,7 @@ public:
 
     pid_t getCurrFgPid() const;
     void setCurrFgPid(pid_t pid);
+    JobsList &getJobs();
 };
 
 #endif //SMASH_COMMAND_H_

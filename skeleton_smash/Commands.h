@@ -267,6 +267,7 @@ public:
 
 struct TimedCommandEntry {
     pid_t pid;
+    pid_t pid2;
     time_t expire_time;
     std::string cmd_line;
 };
@@ -318,7 +319,7 @@ public:
 
     std::string getOriginalCmdLine() const;
 
-    void addTimedCommand(pid_t pid, int duration, const std::string &cmd_line);
+    void addTimedCommand(pid_t pid, int duration, const std::string &cmd_line, pid_t pid2 = -1);
 
     void setPendingTimeout(int duration, const std::string &cmd_line);
 
@@ -326,7 +327,11 @@ public:
 
     bool hasPendingTimeout() const;
 
-    void registerTimedProcess(pid_t pid);
+    void registerTimedProcess(pid_t pid, pid_t pid2 = -1);
+
+    void removeTimedProcess(pid_t pid);
+
+    void rescheduleAlarm(time_t now);
 
     void handleAlarm();
 

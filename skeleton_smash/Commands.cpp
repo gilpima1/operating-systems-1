@@ -163,7 +163,11 @@ void SmallShell::executeCommand(const char *cmd_line) {
         return;
     }
 
-    original_cmd_line = string(cmd_line);
+    string clean_orig(cmd_line);
+    while (!clean_orig.empty() && (clean_orig.back() == '\r' || clean_orig.back() == '\n')) {
+        clean_orig.pop_back();
+    }
+    original_cmd_line = clean_orig;
     string expanded_cmd = expandAlias(cmd_s);
     if (_trim(expanded_cmd).empty()) {
         return;
@@ -725,7 +729,7 @@ void TimeoutCommand::execute() {
         cerr << "smash error: timeout: invalid arguments" << endl;
         return;
     }
-    if (duration <= 0) {
+    if (duration <= 0 || duration > INT_MAX) {
         cerr << "smash error: timeout: invalid arguments" << endl;
         return;
     }
@@ -768,29 +772,7 @@ void TimeoutCommand::execute() {
     }
 }
 
-void SmallShell::addTimedCommand(pid_t pid, int duration, const std::string &cmd_line) {
-    sigset_t mask, old_mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGALRM);
-    sigprocmask(SIG_BLOCK, &mask, &old_mask);
-
-    time_t now = time(nullptr);
-    time_t expire_time = now + duration;
-
-    bool reused = false;
-    for (auto &entry : timed_commands) {
-        if (entry.pid <= 0) {
-            entry.pid = pid;
-            entry.expire_time = expire_time;
-            entry.cmd_line = cmd_line;
-            reused = true;
-            break;
-        }
-    }
-    if (!reused) {
-        timed_commands.push_back({pid, expire_time, cmd_line});
-    }
-
+void SmallShell::rescheduleAlarm(time_t now) {
     time_t min_expire = 0;
     bool has_active = false;
     for (const auto &entry : timed_commands) {
@@ -808,8 +790,36 @@ void SmallShell::addTimedCommand(pid_t pid, int duration, const std::string &cmd
             remaining = 1;
         }
         alarm(remaining);
+    } else {
+        alarm(0);
+    }
+}
+
+void SmallShell::addTimedCommand(pid_t pid, int duration, const std::string &cmd_line, pid_t pid2) {
+    sigset_t mask, old_mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGALRM);
+    sigprocmask(SIG_BLOCK, &mask, &old_mask);
+
+    time_t now = time(nullptr);
+    time_t expire_time = now + duration;
+
+    bool reused = false;
+    for (auto &entry : timed_commands) {
+        if (entry.pid <= 0) {
+            entry.pid = pid;
+            entry.pid2 = pid2;
+            entry.expire_time = expire_time;
+            entry.cmd_line = cmd_line;
+            reused = true;
+            break;
+        }
+    }
+    if (!reused) {
+        timed_commands.push_back({pid, pid2, expire_time, cmd_line});
     }
 
+    rescheduleAlarm(now);
     sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 }
 
@@ -827,11 +837,33 @@ bool SmallShell::hasPendingTimeout() const {
     return pending_timeout_duration > 0;
 }
 
-void SmallShell::registerTimedProcess(pid_t pid) {
+void SmallShell::registerTimedProcess(pid_t pid, pid_t pid2) {
     if (pending_timeout_duration > 0) {
-        addTimedCommand(pid, pending_timeout_duration, pending_timeout_cmd);
+        addTimedCommand(pid, pending_timeout_duration, pending_timeout_cmd, pid2);
         clearPendingTimeout();
     }
+}
+
+void SmallShell::removeTimedProcess(pid_t pid) {
+    if (pid <= 0) return;
+    sigset_t mask, old_mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGALRM);
+    sigprocmask(SIG_BLOCK, &mask, &old_mask);
+
+    bool changed = false;
+    for (auto &entry : timed_commands) {
+        if (entry.pid == pid) {
+            entry.pid = -1;
+            entry.pid2 = -1;
+            changed = true;
+        }
+    }
+    if (changed) {
+        rescheduleAlarm(time(nullptr));
+    }
+
+    sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 }
 
 void SmallShell::handleAlarm() {
@@ -841,9 +873,20 @@ void SmallShell::handleAlarm() {
             siginfo_t infop;
             infop.si_pid = 0;
             int res = waitid(P_PID, entry.pid, &infop, WEXITED | WNOHANG | WNOWAIT);
-            if (res == 0 && infop.si_pid == 0 && kill(entry.pid, 0) == 0) {
-                if (kill(-entry.pid, SIGKILL) == -1) {
+            bool alive1 = (res == 0 && infop.si_pid == 0 && kill(entry.pid, 0) == 0);
+            bool alive2 = false;
+            if (entry.pid2 > 0) {
+                siginfo_t infop2;
+                infop2.si_pid = 0;
+                int res2 = waitid(P_PID, entry.pid2, &infop2, WEXITED | WNOHANG | WNOWAIT);
+                alive2 = (res2 == 0 && infop2.si_pid == 0 && kill(entry.pid2, 0) == 0);
+            }
+            if (alive1 || alive2) {
+                if (alive1 && kill(-entry.pid, SIGKILL) == -1) {
                     kill(entry.pid, SIGKILL);
+                }
+                if (alive2 && kill(-entry.pid2, SIGKILL) == -1) {
+                    kill(entry.pid2, SIGKILL);
                 }
                 const char p1[] = "smash: ";
                 const char p2[] = " timed out!\n";
@@ -851,31 +894,16 @@ void SmallShell::handleAlarm() {
                     write(STDOUT_FILENO, entry.cmd_line.c_str(), entry.cmd_line.length()) == -1 ||
                     write(STDOUT_FILENO, p2, sizeof(p2) - 1) == -1) {
                     entry.pid = -1;
+                    entry.pid2 = -1;
                     continue;
                 }
             }
             entry.pid = -1;
+            entry.pid2 = -1;
         }
     }
 
-    time_t min_expire = 0;
-    bool has_active = false;
-    for (const auto &entry : timed_commands) {
-        if (entry.pid > 0) {
-            if (!has_active || entry.expire_time < min_expire) {
-                min_expire = entry.expire_time;
-                has_active = true;
-            }
-        }
-    }
-
-    if (has_active) {
-        int remaining = static_cast<int>(min_expire - now);
-        if (remaining <= 0) {
-            remaining = 1;
-        }
-        alarm(remaining);
-    }
+    rescheduleAlarm(now);
 }
 
 bool SmallShell::isReservedCommand(const std::string &name) const {
@@ -994,6 +1022,7 @@ void JobsList::removeFinishedJobs() {
         int status = 0;
         pid_t res = waitpid(it->pid, &status, WNOHANG);
         if (res > 0 || (res == -1 && errno == ECHILD)) {
+            SmallShell::getInstance().removeTimedProcess(it->pid);
             it = jobs_vec.erase(it);
         } else {
             ++it;
@@ -1117,6 +1146,7 @@ void ForegroundCommand::execute() {
     if (waitpid(pid, &status, 0) == -1 && errno != EINTR) {
         perror("smash error: waitpid failed");
     }
+    smash.removeTimedProcess(pid);
     smash.setCurrFgPid(-1);
 }
 
@@ -1418,10 +1448,14 @@ void PipeCommand::execute() {
     close(pipefd[0]);
     close(pipefd[1]);
 
+    SmallShell &smash = SmallShell::getInstance();
+    smash.registerTimedProcess(pid1, pid2);
+
     if (waitpid(pid1, nullptr, 0) == -1 && errno != EINTR) {
         perror("smash error: waitpid failed");
     }
     if (waitpid(pid2, nullptr, 0) == -1 && errno != EINTR) {
         perror("smash error: waitpid failed");
     }
+    smash.removeTimedProcess(pid1);
 }

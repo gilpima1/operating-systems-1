@@ -1,4 +1,4 @@
-smash> smash> smash> smash> smash> custom_sh> custom_sh> smash pid is 2826
+smash> smash> smash> smash> smash> custom_sh> custom_sh> smash pid is 2980
 custom_sh> custom_sh> /media/sf_OS1_updated/skeleton_smash
 custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> /media/sf_OS1_updated/skeleton_smash/tmp_smash_test
 custom_sh> custom_sh> custom_sh> custom_sh> /media/sf_OS1_updated/skeleton_smash/tmp_smash_test/sub
@@ -7,14 +7,14 @@ custom_sh> custom_sh> custom_sh> custom_sh> /media/sf_OS1_updated/skeleton_smash
 custom_sh> custom_sh> custom_sh> custom_sh> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> [1] sleep 100&
 [2] sleep 200 &
 [3] sleep 300&
-smash> smash> signal number 9 was sent to pid 2832
+smash> smash> signal number 9 was sent to pid 2986
 smash> smash> smash> smash> [1] sleep 100&
 [3] sleep 300&
 smash> smash> smash> smash> [1] sleep 100&
 [3] sleep 300&
 [4] sleep 1&
-smash> smash> sleep 1& 2835
-smash> smash> smash> smash> sleep 1& 2836
+smash> smash> sleep 1& 2989
+smash> smash> smash> smash> sleep 1& 2990
 smash> smash> [1] sleep 100&
 [3] sleep 300&
 smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> my_ls='ls -1'
@@ -29,7 +29,7 @@ smash> smash> smash> smash> smash> smash> student
 1000
 /home/student
 smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash: got an alarm
-smash: timeout 1 sleep 10 timed out!
+smash: timeout 1 sleep 10 timed out!
 smash> smash> smash> smash> smash: got an alarm
-smash: timeout 1 sleep 10 & timed out!
+smash: timeout 1 sleep 10 & timed out!
 smash> smash> smash> smash> 

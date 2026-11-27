@@ -1,1 +1,173 @@
-smash> smash> hello> hello> hello> hello> smash> smash> smash> smash: sending SIGKILL signal to 0 jobs:
+smash> smash> smash> custom_sh> smash pid is <SMASH_PID>
+
+custom_sh> <BASE_DIR>
+
+custom_sh> custom_sh> smash error: cd: OLDPWD not set
+
+custom_sh> smash error: cd: too many arguments
+
+custom_sh> smash error: chdir failed: No such file or directory
+
+custom_sh> custom_sh> custom_sh> custom_sh> custom_sh> <BASE_DIR>/tmp_smash_test
+
+custom_sh> custom_sh> <BASE_DIR>/tmp_smash_test/sub
+
+custom_sh> custom_sh> <BASE_DIR>/tmp_smash_test
+
+custom_sh> custom_sh> <BASE_DIR>/tmp_smash_test/sub
+
+custom_sh> custom_sh> smash> smash error: fg: jobs list is empty
+
+smash> smash error: fg: job-id 1 does not exist
+
+smash> smash error: fg: invalid arguments
+
+smash> smash> smash> smash> [1] sleep 100&
+
+[2] sleep 200 &
+
+[3] sleep 300&
+
+smash> signal number 9 was sent to pid <PID_2>
+
+smash> smash> [1] sleep 100&
+
+[3] sleep 300&
+
+smash> smash> [1] sleep 100&
+
+[3] sleep 300&
+
+[4] sleep 1&
+
+smash> sleep 1& <PID_4A>
+
+smash> smash> sleep 1& <PID_4B>
+
+smash> [1] sleep 100&
+
+[3] sleep 300&
+
+smash> smash error: kill: invalid arguments
+
+smash> smash error: kill: invalid arguments
+
+smash> smash error: kill: invalid arguments
+
+smash> smash error: kill: job-id 99 does not exist
+
+smash> smash error: kill failed: Invalid argument
+
+smash> tmp_smash_test/a.txt
+
+smash> tmp_smash_test/a.txt
+
+smash> smash> smash error: alias: invalid alias format
+
+smash> smash error: alias: invalid alias format
+
+smash> smash error: alias: quit already exists or is a reserved command
+
+smash> smash error: alias: du already exists or is a reserved command
+
+smash> smash error: alias: whoami already exists or is a reserved command
+
+smash> smash error: alias: timeout already exists or is a reserved command
+
+smash> smash> smash error: alias: my_ls already exists or is a reserved command
+
+smash> smash> my_ls='ls -1'
+
+sl='sleep'
+
+smash> a.txt
+
+fifo1
+
+sub
+
+sym
+
+smash> smash> [1] sleep 100&
+
+[3] sleep 300&
+
+[4] sl 100&
+
+smash> smash error: unalias: not enough arguments
+
+smash> smash error: unalias: no_such_alias alias does not exist
+
+smash> sl='sleep'
+
+smash> smash error: unsetenv: not enough arguments
+
+smash> smash error: unsetenv: NON_EXISTENT_VAR_999 does not exist
+
+smash> smash error: getfiletype: invalid arguments
+
+smash> smash error: getfiletype: invalid arguments
+
+smash> smash error: lstat failed: No such file or directory
+
+smash> tmp_smash_test/a.txt's type is "regular file" and takes up 10 bytes
+
+smash> tmp_smash_test/sub's type is "directory" and takes up <DIR_SIZE> bytes
+
+smash> tmp_smash_test/sym's type is "symbolic link" and takes up 5 bytes
+
+smash> tmp_smash_test/fifo1's type is "FIFO" and takes up 0 bytes
+
+smash> /dev/null's type is "character device" and takes up 0 bytes
+
+smash> smash error: du: too many arguments
+
+smash> Total disk usage: <DU_KB> KB
+
+smash> <USERNAME>
+
+<UID>
+
+<GID>
+
+<HOME_DIR>
+
+smash> smash> smash> smash pid is <SMASH_PID>
+
+<BASE_DIR>
+
+smash> smash> overridden
+
+smash> smash pid is <SMASH_PID>
+
+smash> a.txt
+
+smash> cannot access
+
+smash> smash> overridden
+
+smash> smash error: timeout: invalid arguments
+
+smash> smash error: timeout: invalid arguments
+
+smash> smash error: timeout: invalid arguments
+
+smash> smash error: timeout: invalid arguments
+
+smash> smash error: timeout: invalid arguments
+
+smash> smash: got an alarm
+
+smash: timeout 1 sleep 10 timed out!
+
+smash> smash> smash: got an alarm
+
+smash: timeout 1 sleep 10 & timed out!
+
+smash> smash> smash: sending SIGKILL signal to 3 jobs:
+
+<PID_1>: sleep 100&
+
+<PID_3>: sleep 300&
+
+<PID_4>: sl 100&

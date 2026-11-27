@@ -1,9 +1,191 @@
-sleep 1
-chprompt hello
-sleep 2
-sleep 3
-sleep 5&
+
+
+     
+
+chprompt custom_sh ignored_arg
+
+showpid extra_arg
+
+pwd&
+
+cd
+
+cd -
+
+cd a b
+
+cd /non_existent_path_xyz_999
+
+mkdir -p tmp_smash_test/sub
+
+printf "1234567890" > tmp_smash_test/a.txt
+
+ln -s a.txt tmp_smash_test/sym
+
+mkfifo tmp_smash_test/fifo1
+
+cd tmp_smash_test
+
+pwd
+
+cd sub
+
+pwd
+
+cd -
+
+pwd
+
+cd -
+
+pwd
+
+cd ..
+
 chprompt
-sleep 10&
-sleep 12
+
+fg
+
+fg 1
+
+fg 8 a
+
+sleep 100&
+
+sleep 200 &
+
+sleep 300&
+
+jobs ignored_arg
+
+kill -9 2
+
+sleep 1
+
+jobs
+
+sleep 1&
+
+jobs
+
+fg 4
+
+sleep 1&
+
+fg
+
+jobs
+
+kill
+
+kill 9 1
+
+kill -9
+
+kill -9 99
+
+kill -999 1
+
+ls tmp_smash_test/*.txt
+
+ls tmp_smash_test/?.txt
+
+alias
+
+alias bad name='ls'
+
+alias   extra_space='ls'
+
+alias quit='ls'
+
+alias du='ls'
+
+alias whoami='ls'
+
+alias timeout='ls'
+
+alias my_ls='ls -1'
+
+alias my_ls='pwd'
+
+alias sl='sleep'
+
+alias
+
+my_ls tmp_smash_test
+
+sl 100&
+
+jobs
+
+unalias
+
+unalias my_ls no_such_alias sl
+
+alias
+
+unsetenv
+
+unsetenv NON_EXISTENT_VAR_999
+
+getfiletype
+
+getfiletype a b
+
+getfiletype tmp_smash_test/no_such_file
+
+getfiletype tmp_smash_test/a.txt
+
+getfiletype tmp_smash_test/sub
+
+getfiletype tmp_smash_test/sym
+
+getfiletype tmp_smash_test/fifo1
+
+getfiletype /dev/null
+
+du a b
+
+du tmp_smash_test
+
+whoami ignored_arg
+
+showpid > tmp_smash_test/out.txt
+
+pwd >> tmp_smash_test/out.txt
+
+cat tmp_smash_test/out.txt
+
+echo overridden > tmp_smash_test/out.txt&
+
+cat tmp_smash_test/out.txt
+
+showpid | grep "smash pid is"
+
+ls tmp_smash_test | grep a.txt
+
+ls tmp_smash_test/no_such_dir |& grep -o "cannot access"
+
+alias my_cat='cat'
+
+my_cat tmp_smash_test/out.txt | grep overridden
+
+timeout
+
+timeout 5
+
+timeout 0 sleep 1
+
+timeout -3 sleep 1
+
+timeout abc sleep 1
+
+timeout 1 sleep 10
+
+timeout 1 sleep 10 &
+
+sleep 2
+
+rm -rf tmp_smash_test
+
 quit kill

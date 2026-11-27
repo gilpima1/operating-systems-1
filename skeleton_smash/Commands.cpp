@@ -1154,7 +1154,7 @@ void KillCommand::execute() {
     int signum = 0;
     int job_id = 0;
     if (num_args != 3 || args[1][0] != '-' ||
-        !parseIntStrict(args[1] + 1, signum) ||
+        !parseIntStrict(args[1] + 1, signum) || signum < 0 ||
         !parseIntStrict(args[2], job_id)) {
         cerr << "smash error: kill: invalid arguments" << endl;
         for (int i = 0; i < num_args; ++i) free(args[i]);
@@ -1308,8 +1308,7 @@ void RedirectionCommand::execute() {
     close(fd);
 
     SmallShell &smash = SmallShell::getInstance();
-    string expanded = smash.expandAlias(inner_cmd);
-    Command *cmd = smash.CreateCommand(expanded.c_str());
+    Command *cmd = smash.CreateCommand(inner_cmd.c_str());
     if (cmd != nullptr) {
         cmd->execute();
         delete cmd;
@@ -1375,8 +1374,7 @@ void PipeCommand::execute() {
         close(pipefd[1]);
 
         SmallShell &smash = SmallShell::getInstance();
-        string expanded1 = smash.expandAlias(cmd1_str);
-        Command *cmd1 = smash.CreateCommand(expanded1.c_str());
+        Command *cmd1 = smash.CreateCommand(cmd1_str.c_str());
         if (cmd1 != nullptr) {
             cmd1->execute();
             delete cmd1;
